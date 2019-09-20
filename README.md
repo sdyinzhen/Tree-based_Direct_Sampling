@@ -3,8 +3,8 @@
 
 ### Structure of the TDS setup
 The TDS has two steps:
-* Step 1: Training Phase, run under directory [TDS_TrainingPhase](https://github.com/sdyinzhen/Tree-based_Direct_Sampling/tree/master/TDS_TrainingPhase). This step build a tree using Training Image (TI)
-* Step 2: Simulation Phase, run under [TDS_SimulationPhase2.0](https://github.com/sdyinzhen/Tree-based_Direct_Sampling/tree/master/TDS_SimulationPhase2.0). This step simulate direct sampling realizations using the tree built at Step 1. 
+* Step 1: Training Phase, run under directory [TDS_TrainingPhase](https://github.com/sdyinzhen/Tree-based_Direct_Sampling/tree/master/TDS_TrainingPhase). This step builds a tree using Training Image (TI)
+* Step 2: Simulation Phase, run under [TDS_SimulationPhase2.0](https://github.com/sdyinzhen/Tree-based_Direct_Sampling/tree/master/TDS_SimulationPhase2.0). This step simulates direct sampling realizations using the tree built at Step 1. 
 ### Install and Run TDS
 Please follow the provided [User Manual](https://github.com/sdyinzhen/Tree-based_Direct_Sampling/blob/master/UserManual_Tree-basedDirectSampling.pdf) to install and run TDS
 
