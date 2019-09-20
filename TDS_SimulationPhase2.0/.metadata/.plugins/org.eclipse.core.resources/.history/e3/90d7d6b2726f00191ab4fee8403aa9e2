@@ -1,0 +1,165 @@
+package clusterTreeSimulation;
+
+import java.io.IOException;
+import java.util.Date;
+import java.util.Random;
+
+public class Main_Denmark_DirectSampling3D 
+{
+	public static void main(String arg[]) throws IOException
+	{
+		System.out.println("Denmark groundwater case: original direct sampling 3D mission begin !");
+		System.out.println(new Date());
+		
+		// categorical variable -1 unknown -999 unprocessed
+		final int UnknownValueLabel = -1;
+		final int UnsimulationLabel = -999;
+		
+		final int RealizationAmount = 10;
+//		final int FaciesNumber = 3;
+//		final double SampleRate = 0.005;
+		final int Layer_R = 39;
+		final int Height_R = 133;
+		final int Width_R = 229;
+		
+		// DS parameters
+		final int DS_MaxRadius = 4;
+		final int DS_Neighborhood = 30;
+		final double DS_Threshold = 0.025;
+		final double DS_Fraction = 0.2;
+		
+		// primary and secondary variable
+		final double weight1 = 0.5;
+		final double weight2 = 1 - weight1;
+		
+		// analyze the distance
+		double distance_print_primary_Mean = 0.00;
+		final int distance_print_Amount = 10000;
+		
+		final int TI_Layer = 39;
+		final int TI_Height = 133;
+		final int TI_Width = 229;
+		
+		TrainingImage3D TI0 = new TrainingImage3D(TI_Layer, TI_Height, TI_Width);
+		TI0.ReadPrimaryTrainingImageTxt(new String("z_DenmarkGroundwater_3D_TrainingImage.txt"));
+		int DS_SearchScope = TI0.GetValueAmount(UnsimulationLabel);
+		DS_SearchScope = (TI_Layer * TI_Height * TI_Width) - DS_SearchScope;
+		DS_SearchScope = (int)((double)(DS_SearchScope) * DS_Fraction);
+		System.out.println(new String("the search scope is "+ DS_SearchScope));
+
+		SoftData3D soft_TI = new SoftData3D(TI_Layer, TI_Height, TI_Width);
+		soft_TI.ReadSoftDataTxt(new String("z_DenmarkGroundwater_3D_TrainingSoftData.txt"));
+		double softMaxDifference = soft_TI.GetMaxDifference((double)(UnsimulationLabel+1));
+		
+		Realization3D realization_Original = new Realization3D(Layer_R,Height_R,Width_R);
+		Realization3D realization = new Realization3D(Layer_R,Height_R,Width_R);
+		realization_Original.ReadRealizationFile(new String("z_DenmarkGroundwater_3D_SimulationDomain.txt"));
+		realization_Original.ReadHardData(new String("z_DenmarkGroundwater_3D_HardData.txt"));
+		//realization_Original.PrintOut_SGeMS(new String("z_DenmarkGroundwater_3D_HardData.sgems"),Layer_R,Height_R,Width_R,new String("hydroUnit"));
+		final int unknownAmount = realization_Original.GetValueAmount(UnknownValueLabel); // -1 is the unknown point
+		System.out.println(new String("the number of unknown points is "+unknownAmount));
+		
+		SoftData3D soft_SG = new SoftData3D(Layer_R,Height_R,Width_R);
+		soft_SG.ReadSoftDataTxt(new String("z_DenmarkGroundwater_3D_TrainingSoftData.txt"));
+		
+		double[][][] distanceImage = new double[TI_Layer][TI_Height][TI_Width];
+		int realizationIndex=0,unknownIndex=0,unknownX=0,unknownY=0,unknownZ=0,unknownValue=0;
+		int randomX=0, randomY=0, randomZ=0, randomIndex=0, randomValue=0;
+		double distance_min=0.0,distance0=0.0,distance1=0.0,distance2=0.0;
+		
+		Random random = new Random();
+		PatternDS_3D pattern_DS = new PatternDS_3D();
+		
+		// record the running time
+		Date end = new Date();
+		int CostTime = 0;
+		
+		// 3D simulations
+		System.out.println("3D simulations begin !");
+		System.out.println(new Date());
+		Date start = new Date();
+		for(realizationIndex=0;realizationIndex!=RealizationAmount;++realizationIndex)
+		{
+			System.out.println("realization"+realizationIndex);
+			System.out.println(new Date());
+			realization.SetRealizationMatrix(realization_Original.GetRealizationMatrix());
+			realization.SetExtractOrder(DS_MaxRadius);
+			unknownIndex = 0;
+			while(unknownIndex < unknownAmount)
+			{
+				unknownZ = Math.abs(random.nextInt()%Layer_R);
+				unknownY = Math.abs(random.nextInt()%Height_R);
+				unknownX = Math.abs(random.nextInt()%Width_R);
+				if(realization.GetValue(unknownZ, unknownY, unknownX) == UnknownValueLabel)
+				{
+					pattern_DS = new PatternDS_3D(realization.GetPattern_DS(unknownZ, unknownY, unknownX, DS_Neighborhood, DS_MaxRadius, UnknownValueLabel));
+					if(pattern_DS.GetKnownPointAmount()==0)
+					{
+						continue;
+					}
+					else
+					{
+						// System.out.println(unknownIndex);
+						// initialization
+						distanceImage = new double[TI_Layer][TI_Height][TI_Width];
+						randomIndex = 0;
+						distance_min = 1.0;
+						
+						while(randomIndex < DS_SearchScope)
+						{
+							randomZ = Math.abs(random.nextInt()%TI_Layer);
+							randomY = Math.abs(random.nextInt()%TI_Height);
+							randomX = Math.abs(random.nextInt()%TI_Width);
+							randomValue = TI0.GetValue(randomZ, randomY, randomX);
+							if(randomValue>UnknownValueLabel && distanceImage[randomZ][randomY][randomX]==0.0)
+							{
+								distance1 = TI0.GetPatternDistance_Hamming(randomZ, randomY, randomX, pattern_DS);
+								distance2 = Math.abs(soft_SG.GetValue(unknownZ, unknownY, unknownX) - soft_TI.GetValue(randomZ, randomY, randomX));
+								distance2 = distance2 / softMaxDifference;
+								
+								distance0 = weight1 * distance1 + weight2 * distance2;
+								// is the training pattern satisfied?
+								if(distance0 <= DS_Threshold)
+								{
+									distance_min = distance0;
+									unknownValue = randomValue;
+									break;
+								}
+								else if (distance0 < distance_min)
+								{
+									unknownValue = randomValue;
+									distance_min = distance0;
+								}
+								distanceImage[randomZ][randomY][randomX] = distance0;
+								++randomIndex; 
+							}
+						}
+						// analyze the search result
+						distance_print_primary_Mean += distance_min;
+						if(unknownIndex % distance_print_Amount==0)
+						{
+							System.out.println(distance_print_primary_Mean/distance_print_Amount);
+							distance_print_primary_Mean = 0.0;
+						}
+						//paste a point
+						realization.SetValue(unknownZ, unknownY, unknownX, unknownValue);
+						++unknownIndex;
+					}
+				}
+			}
+			realization.PrintOut_SGeMS(new String("z_DenmarkGroundwater_DS"+realizationIndex+".sgems"),Layer_R,Height_R,Width_R,new String("hydroUnit"));
+			System.out.println("Print out realization"+realizationIndex);
+			System.out.println(new Date());
+			end = new Date();
+			CostTime = (int) (end.getTime()-start.getTime())/1000;
+			System.out.println(new String("The program costs "+ CostTime + " seconds so far"));
+		}
+		System.out.println(new Date());
+		end = new Date();
+		CostTime = (int) (end.getTime()-start.getTime())/1000;
+		System.out.println(new String("The simulation procedure costs "+ CostTime + " seconds"));
+		System.out.println(new String("The whole procedure have been accomplished !"));
+		return;
+		
+	}
+}
