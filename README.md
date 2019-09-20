@@ -1,5 +1,5 @@
 # TDS: Tree-based Direct Sampling (on 2D Topography modeling)
-<p> This is the first version of the Tree-based Direct Sampling (TDS), with 2D Antactica Topography modeling case as example. 
+<p> This is the first version of the Tree-based Direct Sampling (TDS), with 2D Antarctica Topography modeling case as example. 
 
 ### Structure of the TDS setup
 The TDS has two steps:
