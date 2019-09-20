@@ -16,7 +16,7 @@ To run the TDS, the following dependencies must be met:
 * [Eclipse IDE for Java](https://www.eclipse.org/downloads/)
 
 ### Tutorial
-For illustration, a Tutorial is provided in the [User Manual](https://github.com/sdyinzhen/Tree-based_Direct_Sampling/blob/master/UserManual_Tree-basedDirectSampling.pdf). 
+A Tutorial example is provided in the [User Manual](https://github.com/sdyinzhen/Tree-based_Direct_Sampling/blob/master/UserManual_Tree-basedDirectSampling.pdf). 
 
 ### Contact
 Please contact [David Zhen Yin](mailto:yinzhen@stanford.edu) or [Chen Zuo](mailto:chenzuo789@outlook.com) in case of questions. 
