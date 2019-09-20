@@ -18,5 +18,8 @@ To run the TDS, the following dependencies must be met:
 ### Tutorial
 For illustration, a Tutorial is provided in the [User Manual](https://github.com/sdyinzhen/Tree-based_Direct_Sampling/blob/master/UserManual_Tree-basedDirectSampling.pdf). 
 
+### Contact
+Please contact David Zhen Yin(mailto:yinzhen@stanford.edu) in case of questions. 
+
 ### Licensing
 This repository is released under the MIT License.
