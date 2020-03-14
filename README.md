@@ -1,4 +1,7 @@
 # TDS: Tree-based Direct Sampling (on 2D Topography modeling)
+Code Reference - 
+* [Zuo, C., Yin, Z., Pan, Z., MacKie, E. J., & Caers, J. ( 2020). A tree‐based direct sampling method for stochastic surface and subsurface hydrological modeling. Water Resources Research, 56, e2019WR026130.](https://agupubs.onlinelibrary.wiley.com/doi/abs/10.1029/2019WR026130/)
+
 <p> This is the first version of the Tree-based Direct Sampling (TDS), with 2D Antarctica Topography modeling case as example. 
 
 ### Structure of the TDS setup
